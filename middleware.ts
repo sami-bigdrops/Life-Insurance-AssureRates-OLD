@@ -3,15 +3,14 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const hostname = request.headers.get('host') || ''
 
-  // Check if the request is for the root path on life.assurerates.com
-  if (hostname.includes('life.assurerates.com') && pathname === '/') {
-    // Redirect to /long
-    return NextResponse.redirect(new URL('/long', request.url))
+  // Allow access to maintenance page and static assets
+  if (pathname === '/maintenance') {
+    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  // Redirect all other routes to maintenance page
+  return NextResponse.redirect(new URL('/maintenance', request.url))
 }
 
 export const config = {
