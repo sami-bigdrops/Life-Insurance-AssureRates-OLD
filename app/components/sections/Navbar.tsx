@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import React, { useEffect } from 'react'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 // List of landing pages that should be tracked
@@ -60,15 +59,13 @@ const Navbar = () => {
             <div className="flex justify-center items-center h-20">
               <div className="shrink-0">
                 <Link href={getLogoHref()} className="block">
-                  <Image
-                    src="/AssureRates.svg"
+                  <img
+                    src="/logo.svg"
                     alt="AssureRates Logo"
-                    width={180}
-                    height={40}
-                    priority
-                    quality={90}
-                    loading="eager"
+                    width={240}
+                    height={46}
                     className="h-auto w-60 cursor-pointer"
+                    style={{ display: 'block' }}
                   />
                 </Link>
               </div>

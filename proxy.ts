@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Allow access to maintenance page and static assets
+  // Allow access to maintenance page
   if (pathname === '/maintenance') {
+    return NextResponse.next()
+  }
+
+  // Allow static files (images, fonts, etc.)
+  const staticFileExtensions = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.woff', '.woff2', '.ttf', '.eot']
+  const isStaticFile = staticFileExtensions.some(ext => pathname.toLowerCase().endsWith(ext))
+  
+  if (isStaticFile) {
     return NextResponse.next()
   }
 
