@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import RadioButtonGroup from '@/app/components/RadioButtonGroup'
 import DatePicker from '@/app/components/DatePicker'
-import { validateName, validateZipCode, validateDateOfBirth } from '@/utils/validation'
+import { validateName, validateZipCode, validateDateOfBirth, validatePhoneNumber } from '@/utils/validation'
 
 const FpsForm = () => {
   const [firstName, setFirstName] = useState('')
@@ -18,12 +18,14 @@ const FpsForm = () => {
     return ''
   })
   const [dateOfBirth, setDateOfBirth] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
 
   const [firstNameError, setFirstNameError] = useState<string>('')
   const [lastNameError, setLastNameError] = useState<string>('')
   const [genderError, setGenderError] = useState<string>('')
   const [zipCodeError, setZipCodeError] = useState<string>('')
   const [dateOfBirthError, setDateOfBirthError] = useState<string>('')
+  const [phoneNumberError, setPhoneNumberError] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async () => {
@@ -33,6 +35,7 @@ const FpsForm = () => {
     const genderValidation = gender ? { valid: true } : { valid: false, error: 'Gender is required' }
     const zipCodeValidation = validateZipCode(zipCode)
     const dateOfBirthValidation = validateDateOfBirth(dateOfBirth)
+    const phoneNumberValidation = validatePhoneNumber(phoneNumber)
 
     // Set errors
     if (!firstNameValidation.valid) {
@@ -65,6 +68,12 @@ const FpsForm = () => {
     }
     setDateOfBirthError('')
 
+    if (!phoneNumberValidation.valid) {
+      setPhoneNumberError(phoneNumberValidation.error || 'Phone number is required')
+      return
+    }
+    setPhoneNumberError('')
+
     // Store zip code in localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('zipCode', zipCode)
@@ -84,7 +93,8 @@ const FpsForm = () => {
         lastName,
         gender,
         zipCode,
-        dateOfBirth
+        dateOfBirth,
+        phoneNumber
       })
       
       // TODO: Handle successful submission (redirect, etc.)
@@ -107,6 +117,131 @@ const FpsForm = () => {
         setZipCodeError('')
       }
     }
+  }
+
+  // Custom phone number formatter: (123) 456 - 7890
+  const formatPhoneNumberCustom = (digits: string): string => {
+    const cleanDigits = digits.replace(/\D/g, '').slice(0, 10)
+    
+    if (cleanDigits.length === 0) {
+      return ''
+    } else if (cleanDigits.length <= 3) {
+      return `(${cleanDigits}`
+    } else if (cleanDigits.length <= 6) {
+      return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3)}`
+    } else {
+      return `(${cleanDigits.slice(0, 3)}) ${cleanDigits.slice(3, 6)} - ${cleanDigits.slice(6)}`
+    }
+  }
+
+  // Helper function to count digits before a given position
+  const countDigitsBeforePosition = (value: string, position: number): number => {
+    let count = 0
+    for (let i = 0; i < Math.min(position, value.length); i++) {
+      if (/\d/.test(value[i])) {
+        count++
+      }
+    }
+    return count
+  }
+
+  // Helper function to find cursor position after a specific number of digits
+  const findCursorPositionAfterDigits = (formatted: string, digitCount: number): number => {
+    let count = 0
+    for (let i = 0; i < formatted.length; i++) {
+      if (/\d/.test(formatted[i])) {
+        count++
+        if (count === digitCount) {
+          return i + 1
+        }
+      }
+    }
+    return formatted.length
+  }
+
+  // Handle phone number input with proper cursor management
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target
+    const cursorPosition = input.selectionStart || 0
+    const oldValue = phoneNumber
+    const newValue = e.target.value
+
+    // Extract digits from old and new values
+    const oldDigits = oldValue.replace(/\D/g, '')
+    const newDigits = newValue.replace(/\D/g, '')
+
+    // Count how many digits were before the cursor in the old value
+    const digitsBeforeCursor = countDigitsBeforePosition(oldValue, cursorPosition)
+
+    // Handle backspace
+    if (e.nativeEvent instanceof InputEvent && e.nativeEvent.inputType === 'deleteContentBackward') {
+      // If cursor is right after a formatting character, delete the digit before it
+      if (cursorPosition > 0) {
+        const charBefore = oldValue[cursorPosition - 1]
+        if (charBefore === '(' || charBefore === ')' || charBefore === ' ' || charBefore === '-') {
+          // We want to delete the digit that comes before this formatting character
+          // So we keep digitsBeforeCursor - 1 digits
+          const digitsToKeep = Math.max(0, digitsBeforeCursor - 1)
+          const updatedDigits = oldDigits.slice(0, digitsToKeep)
+          const formatted = formatPhoneNumberCustom(updatedDigits)
+          
+          setPhoneNumber(formatted)
+          if (phoneNumberError) {
+            setPhoneNumberError('')
+          }
+          
+          // Position cursor after the kept digits
+          setTimeout(() => {
+            const newCursorPos = findCursorPositionAfterDigits(formatted, digitsToKeep)
+            input.setSelectionRange(newCursorPos, newCursorPos)
+          }, 0)
+          
+          return
+        }
+      }
+
+      // Normal backspace - format and maintain cursor position
+      const formatted = formatPhoneNumberCustom(newDigits)
+      setPhoneNumber(formatted)
+      if (phoneNumberError) {
+        setPhoneNumberError('')
+      }
+      
+      // Position cursor to maintain the same digit position
+      setTimeout(() => {
+        const targetDigitCount = Math.min(digitsBeforeCursor, newDigits.length)
+        const newCursorPos = findCursorPositionAfterDigits(formatted, targetDigitCount)
+        input.setSelectionRange(newCursorPos, newCursorPos)
+      }, 0)
+      
+      return
+    }
+
+    // Handle normal typing
+    const formatted = formatPhoneNumberCustom(newDigits)
+    setPhoneNumber(formatted)
+    if (phoneNumberError) {
+      setPhoneNumberError('')
+    }
+    
+    // Determine new cursor position
+    setTimeout(() => {
+      let targetDigitCount: number
+      
+      if (newDigits.length > oldDigits.length) {
+        // Added a digit - move cursor forward by one digit
+        targetDigitCount = digitsBeforeCursor + 1
+      } else if (newDigits.length < oldDigits.length) {
+        // Removed a digit (delete key) - maintain position
+        targetDigitCount = Math.min(digitsBeforeCursor, newDigits.length)
+      } else {
+        // Same number of digits (paste or other operation) - maintain position
+        targetDigitCount = Math.min(digitsBeforeCursor, newDigits.length)
+      }
+      
+      const newCursorPos = findCursorPositionAfterDigits(formatted, targetDigitCount)
+      input.setSelectionRange(newCursorPos, newCursorPos)
+    }, 0)
   }
 
   return (
@@ -249,6 +384,36 @@ const FpsForm = () => {
               />
               {dateOfBirthError && (
                 <p className="mt-1 text-sm text-red-600 font-medium">{dateOfBirthError}</p>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <label htmlFor="phoneNumber" className="block text-sm font-semibold text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                placeholder="(123) 456 - 7890"
+                value={phoneNumber}
+                onChange={handlePhoneNumberChange}
+                onBlur={() => {
+                  const validation = validatePhoneNumber(phoneNumber)
+                  if (!validation.valid) {
+                    setPhoneNumberError(validation.error || '')
+                  } else {
+                    setPhoneNumberError('')
+                  }
+                }}
+                className={`w-full px-4 py-3 text-gray-900 text-[16px] font-semibold rounded-lg border transition-all duration-200 h-12 bg-white focus:outline-none focus:ring-2 ${
+                  phoneNumberError
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:ring-[#3498DB] focus:border-[#3498DB]'
+                }`}
+              />
+              {phoneNumberError && (
+                <p className="mt-1 text-sm text-red-600 font-medium">{phoneNumberError}</p>
               )}
             </div>
 

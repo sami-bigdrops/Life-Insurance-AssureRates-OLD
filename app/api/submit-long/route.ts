@@ -4,7 +4,32 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    const { firstName, lastName, gender, dateOfBirth, zipCode, phoneNumber, email, subid1, subid2, subid3, trustedformCertUrl } = body
+    const { 
+      firstName, 
+      lastName, 
+      gender, 
+      dateOfBirth, 
+      zipCode, 
+      phoneNumber, 
+      email,
+      address,
+      city,
+      state,
+      addressZipCode,
+      married,
+      heightFeet,
+      heightInches,
+      weight,
+      tobacco,
+      hasHealthConditions,
+      coverage,
+      coverageAmount,
+      height,
+      subid1,
+      subid2,
+      subid3,
+      trustedformCertUrl
+    } = body
 
     // Strip formatting from phone number (remove all non-digit characters)
     const cleanedPhoneNumber = phoneNumber ? phoneNumber.replace(/\D/g, '') : ''
@@ -20,7 +45,7 @@ export async function POST(request: NextRequest) {
       if (!cleanedPhoneNumber) missingFields.push('phoneNumber');
       if (!email) missingFields.push('email');
       return NextResponse.json(
-        { error: 'All fields are required', missingFields },
+        { error: 'All required fields are missing', missingFields },
         { status: 400 }
       )
     }
@@ -30,11 +55,11 @@ export async function POST(request: NextRequest) {
     const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown'
 
     // Validate required environment variables
-    if (!process.env.FPS_LEADPROSPER_CAMPAIGN_ID || !process.env.FPS_LEADPROSPER_SUPPLIER_ID || !process.env.FPS_LEADPROSPER_API_KEY || !process.env.LEADPROSPER_API_URL) {
+    if (!process.env.LONG_LEADPROSPER_CAMPAIGN_ID || !process.env.LONG_LEADPROSPER_SUPPLIER_ID || !process.env.LONG_LEADPROSPER_API_KEY || !process.env.LEADPROSPER_API_URL) {
       const missingVars = [];
-      if (!process.env.FPS_LEADPROSPER_CAMPAIGN_ID) missingVars.push('FPS_LEADPROSPER_CAMPAIGN_ID');
-      if (!process.env.FPS_LEADPROSPER_SUPPLIER_ID) missingVars.push('FPS_LEADPROSPER_SUPPLIER_ID');
-      if (!process.env.FPS_LEADPROSPER_API_KEY) missingVars.push('FPS_LEADPROSPER_API_KEY');
+      if (!process.env.LONG_LEADPROSPER_CAMPAIGN_ID) missingVars.push('LONG_LEADPROSPER_CAMPAIGN_ID');
+      if (!process.env.LONG_LEADPROSPER_SUPPLIER_ID) missingVars.push('LONG_LEADPROSPER_SUPPLIER_ID');
+      if (!process.env.LONG_LEADPROSPER_API_KEY) missingVars.push('LONG_LEADPROSPER_API_KEY');
       if (!process.env.LEADPROSPER_API_URL) missingVars.push('LEADPROSPER_API_URL');
       
       return NextResponse.json(
@@ -48,9 +73,9 @@ export async function POST(request: NextRequest) {
 
     // Prepare the data for LeadProsper
     const formData = {
-      lp_campaign_id: process.env.FPS_LEADPROSPER_CAMPAIGN_ID,
-      lp_supplier_id: process.env.FPS_LEADPROSPER_SUPPLIER_ID,
-      lp_key: process.env.FPS_LEADPROSPER_API_KEY,
+      lp_campaign_id: process.env.LONG_LEADPROSPER_CAMPAIGN_ID,
+      lp_supplier_id: process.env.LONG_LEADPROSPER_SUPPLIER_ID,
+      lp_key: process.env.LONG_LEADPROSPER_API_KEY,
       lp_subid1: subid1,
       lp_subid2: subid2,
       lp_subid3: subid3,
@@ -61,6 +86,19 @@ export async function POST(request: NextRequest) {
       date_of_birth: dateOfBirth.trim(),
       zip_code: zipCode.trim(),
       phone_number: cleanedPhoneNumber,
+      address: address?.trim() || '',
+      city: city?.trim() || '',
+      state: state?.trim() || '',
+      address_zip_code: addressZipCode?.trim() || '',
+      married: married?.trim() || '',
+      height: height || '',
+      height_feet: heightFeet?.trim() || '',
+      height_inches: heightInches?.trim() || '',
+      weight: weight?.trim() || '',
+      tobacco: tobacco?.trim() || '',
+      has_health_conditions: hasHealthConditions?.trim() || '',
+      coverage: coverage?.trim() || '',
+      coverage_amount: coverageAmount?.trim() || '',
       ip_address: ip,
       user_agent: request.headers.get('user-agent') || '',
       landing_page_url: request.headers.get('referer') || '',
@@ -133,3 +171,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+

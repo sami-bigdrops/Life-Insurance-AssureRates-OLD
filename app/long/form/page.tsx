@@ -173,35 +173,63 @@ const LongForm = () => {
       })
     }
 
-    // Auto-advance to next step if enabled
+    // Auto-advance to next step if enabled and step is valid
     if (autoAdvance) {
       setTimeout(() => {
-        setCurrentStep(prev => prev + 1)
-      }, 150)
+        // Check if current step is valid before advancing
+        const updatedFormData = { ...formData, [field]: value }
+        const stepValid = checkStepValidity(currentStep, updatedFormData)
+        
+        if (stepValid) {
+          const finalStep = 13
+          if (currentStep < finalStep) {
+            setCurrentStep(prev => prev + 1)
+          }
+        }
+      }, 300)
     }
   }
 
-  // Validate field on blur
-  const validateField = (field: string, value: string | number) => {
-    let validation: { valid: boolean; error?: string } = { valid: true }
-    
-    switch (field) {
-      case 'dateOfBirth':
-        validation = validateDateOfBirth(String(value))
-        break
+  // Helper function to check step validity with updated form data
+  const checkStepValidity = (step: number, data: typeof formData): boolean => {
+    switch (step) {
+      case 1:
+        return validateDateOfBirth(data.dateOfBirth).valid
+      case 2:
+        return data.gender !== ''
+      case 3:
+        return data.married !== ''
+      case 4:
+        return data.heightFeet !== '' && data.heightInches !== ''
+      case 5:
+        return data.weight !== ''
+      case 6:
+        return data.tobacco !== ''
+      case 7:
+        return data.hasHealthConditions !== ''
+      case 8:
+        return data.coverage !== ''
+      case 9:
+        return data.coverageAmount !== ''
+      case 10:
+        return (
+          validateName(data.firstName, 'First name').valid &&
+          validateName(data.lastName, 'Last name').valid
+        )
+      case 11:
+        return (
+          validateAddress(data.address).valid &&
+          validateCity(data.city).valid &&
+          data.state !== '' &&
+          validateZipCode(data.addressZipCode).valid
+        )
+      case 12:
+        return validateEmail(data.email).valid
+      case 13:
+        return validatePhoneNumber(data.phoneNumber).valid
+      default:
+        return true
     }
-
-    if (!validation.valid && validation.error) {
-      setErrors(prev => ({ ...prev, [field]: validation.error! }))
-    } else {
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors[field]
-        return newErrors
-      })
-    }
-
-    return validation.valid
   }
 
   const handleNext = async () => {
@@ -467,7 +495,7 @@ const LongForm = () => {
                 <RadioButtonGroup
                   value={formData.gender}
                   onChange={(value: string) => {
-                    handleInputChange('gender', value)
+                    handleInputChange('gender', value, true)
                     if (errors.gender) {
                       setErrors(prev => {
                         const newErrors = { ...prev }
@@ -499,7 +527,7 @@ const LongForm = () => {
                 <RadioButtonGroup
                   value={formData.married}
                   onChange={(value: string) => {
-                    handleInputChange('married', value)
+                    handleInputChange('married', value, true)
                     if (errors.married) {
                       setErrors(prev => {
                         const newErrors = { ...prev }
@@ -702,7 +730,7 @@ const LongForm = () => {
                 <RadioButtonGroup
                   value={formData.tobacco}
                   onChange={(value: string) => {
-                    handleInputChange('tobacco', value)
+                    handleInputChange('tobacco', value, true)
                     if (errors.tobacco) {
                       setErrors(prev => {
                         const newErrors = { ...prev }
@@ -766,7 +794,7 @@ const LongForm = () => {
                   <RadioButtonGroup
                     value={formData.hasHealthConditions || ''}
                     onChange={(value: string) => {
-                      handleInputChange('hasHealthConditions', value)
+                      handleInputChange('hasHealthConditions', value, true)
                       if (errors.hasHealthConditions) {
                         setErrors(prev => {
                           const newErrors = { ...prev }
@@ -799,7 +827,7 @@ const LongForm = () => {
                 <RadioButtonGroup
                   value={formData.coverage || ''}
                   onChange={(value: string) => {
-                    handleInputChange('coverage', value)
+                    handleInputChange('coverage', value, true)
                     if (errors.coverage) {
                       setErrors(prev => {
                         const newErrors = { ...prev }
@@ -841,7 +869,7 @@ const LongForm = () => {
                 <RadioButtonGroup
                   value={formData.coverageAmount || ''}
                   onChange={(value: string) => {
-                    handleInputChange('coverageAmount', value)
+                    handleInputChange('coverageAmount', value, true)
                     if (errors.coverageAmount) {
                       setErrors(prev => {
                         const newErrors = { ...prev }
