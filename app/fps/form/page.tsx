@@ -436,7 +436,7 @@ const FpsForm = () => {
             {/* Disclaimer */}
             <div className="text-sm text-gray-600 mt-4">
               <p>
-                By clicking above, you agree to our <a href="/privacy-policy" className="text-[#3498DB] hover:underline">Privacy Policy</a> and to receive insurance offers from Fidelity Life, eFinancial or their partner agents at the email address or telephone numbers you provided, including autodialed, pre-recorded calls, artificial voice or text messages. You understand that consent is not a condition of purchase and your consent may be revoked at any time.
+                By clicking above, you agree to our <a href="/privacy-policy" className="text-[#3498DB] hover:underline">Privacy Policy</a> and to receive insurance offers from AssureRates.com or their partner agents at the email address or telephone numbers you provided, including autodialed, pre-recorded calls, artificial voice or text messages. You understand that consent is not a condition of purchase and your consent may be revoked at any time.
               </p>
             </div>
           </div>
