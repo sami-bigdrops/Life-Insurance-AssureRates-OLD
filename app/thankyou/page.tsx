@@ -213,11 +213,11 @@ export default function ThankYouPage() {
             <div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-xl p-6 md:p-7 border-l-4 border-[#3498DB]">
               <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-[#246a99] mb-3 font-sans">
-                  We will reach you shortly
+                  We will get back to you shortly
                 </h2>
                 <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-                  Our team of mortgage experts will contact you within 24 hours to discuss your options 
-                  and answer any questions you may have. We&apos;re here to help make your homeownership dreams come true.
+                  Our team of life insurance experts will contact you within 24 hours to discuss your options 
+                  and answer any questions you may have. We&apos;re here to help make your life insurance dreams come true.
                 </p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function ThankYouPage() {
                 <div className="max-w-3xl mx-auto text-center">
                   <p className="text-sm md:text-base text-gray-700 leading-relaxed">
                     A confirmation message has been sent to your email address. The message contains 
-                    information about your mortgage application and next steps. Please make sure to check 
+                    information about your life insurance application and next steps. Please make sure to check 
                     your spam folder if you don&apos;t see it in your inbox.
                   </p>
                 </div>
