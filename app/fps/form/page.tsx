@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import RadioButtonGroup from '@/app/components/RadioButtonGroup'
-import DatePicker from '@/app/components/DatePicker'
+import DateOfBirthInput from '@/app/components/DateOfBirthInput'
 import { validateName, validateZipCode, validateDateOfBirth, validatePhoneNumber } from '@/utils/validation'
 
 const FpsForm = () => {
@@ -367,24 +367,17 @@ const FpsForm = () => {
               )}
             </div>
 
-            {/* Date of Birth - Custom Calendar */}
+            {/* Date of Birth */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Date of Birth
-              </label>
-              <DatePicker
+              <DateOfBirthInput
                 value={dateOfBirth}
                 onChange={(date) => {
                   setDateOfBirth(date)
                   if (dateOfBirthError) setDateOfBirthError('')
                 }}
                 minAge={18}
-                placeholder="Select Date of Birth"
                 error={dateOfBirthError}
               />
-              {dateOfBirthError && (
-                <p className="mt-1 text-sm text-red-600 font-medium">{dateOfBirthError}</p>
-              )}
             </div>
 
             {/* Phone Number */}

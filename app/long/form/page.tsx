@@ -5,7 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ProgressBar from '@/app/long/components/ui/ProgressBar'
-import DatePicker from '@/app/components/DatePicker'
+import DateOfBirthInput from '@/app/components/DateOfBirthInput'
 import RadioButtonGroup from '@/app/components/RadioButtonGroup'
 import StateDropdown from '@/app/components/StateDropdown'
 import { validateDateOfBirth, validateName, validateAddress, validateCity, validateZipCode, validateEmail, validatePhoneNumber } from '@/utils/validation'
@@ -465,7 +465,7 @@ const LongForm = () => {
                 What is your Date of Birth?
               </h2>
               <div className="mb-8">
-                <DatePicker
+                <DateOfBirthInput
                   value={formData.dateOfBirth}
                   onChange={(date) => {
                     handleInputChange('dateOfBirth', date)
@@ -478,8 +478,17 @@ const LongForm = () => {
                     }
                   }}
                   minAge={18}
-                  placeholder="Select Date of Birth"
                   error={errors.dateOfBirth}
+                  onComplete={(date) => {
+                    setTimeout(() => {
+                      const updatedFormData = { ...formData, dateOfBirth: date }
+                      if (checkStepValidity(1, updatedFormData) && currentStep === 1) {
+                        if (currentStep < 13) {
+                          setCurrentStep(prev => prev + 1)
+                        }
+                      }
+                    }, 100)
+                  }}
                 />
               </div>
             </>
