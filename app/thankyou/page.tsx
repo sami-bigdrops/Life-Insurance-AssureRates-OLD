@@ -256,7 +256,7 @@ export default function ThankYouPage() {
                 <div className="flex justify-center items-center">
                   <div className="bg-white rounded-lg p-3 md:p-4 shadow-lg">
                     <Image 
-                      src="/auto-assurerates.svg" 
+                      src="/logo.svg" 
                       alt="AssureRates Auto" 
                       width={180} 
                       height={80}
@@ -416,7 +416,7 @@ export default function ThankYouPage() {
                 <div className="flex justify-center items-center">
                   <div className="bg-white rounded-lg p-3 md:p-4 shadow-lg">
                     <Image 
-                      src="/auto-assurerates.svg" 
+                      src="/logo.svg" 
                       alt="AssureRates Home" 
                       width={180} 
                       height={80}
@@ -576,7 +576,7 @@ export default function ThankYouPage() {
                 <div className="flex justify-center items-center">
                   <div className="bg-white rounded-lg p-3 md:p-4 shadow-lg">
                     <Image 
-                      src="/auto-assurerates.svg" 
+                      src="/logo.svg" 
                       alt="AssureRates Mortgage" 
                       width={180} 
                       height={80}
